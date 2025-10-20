@@ -11,7 +11,7 @@ class DroneControlApp(QMainWindow):
     def __init__(self):
         super().__init__()
         
-        # Загружаем UI файл
+        # Загружаем единый UI файл
         ui_file = os.path.join(os.path.dirname(__file__), 'UI_HUD.ui')
         uic.loadUi(ui_file, self)
         
@@ -38,7 +38,7 @@ class DroneControlApp(QMainWindow):
         # Настройка соединений сигналов
         self.setup_connections()
         
-        # Настройка интерфейса
+        # Настройка интерфейса (все элементы уже есть в UI файле)
         self.setup_interface()
         
         # Таймер для обновления телеметрии
@@ -141,172 +141,58 @@ class DroneControlApp(QMainWindow):
         # Кнопка настроек
         self.settingsButton.clicked.connect(self.open_settings)
         
+        # Кнопка переключения режима батареи
+        if hasattr(self, 'batteryModeButton'):
+            self.batteryModeButton.clicked.connect(self.toggle_battery_mode)
+            
+        # Кнопки пресетов подключения
+        if hasattr(self, 'missionPlannerButton'):
+            self.missionPlannerButton.clicked.connect(lambda: self.set_connection_preset("127.0.0.1", 14551, "UDP"))
+        if hasattr(self, 'sitlButton'):
+            self.sitlButton.clicked.connect(lambda: self.set_connection_preset("127.0.0.1", 5760, "TCP"))
+        
     def setup_interface(self):
         """Настройка дополнительных элементов интерфейса"""
+        # Все элементы уже созданы в UI файле, просто настраиваем их
         
-        # Добавляем виджеты в левую панель (Телеметрия)
-        self.setup_telemetry_panel()
-        
-        # Добавляем виджеты в центральную панель (Список дронов)
-        self.setup_drones_panel()
-        
-        # Добавляем виджеты в правую панель (Настройки)
-        self.setup_settings_panel()
-        
-    def setup_telemetry_panel(self):
-        """Настройка панели телеметрии"""
-        # Создаем виджеты для отображения телеметрии
-        self.telemetry_layout = QVBoxLayout()
-        
-        # Индикатор подключения
-        self.connection_status_button = QtWidgets.QPushButton("● ВІДКЛЮЧЕНО")
-        self.connection_status_button.setStyleSheet("""
-            QPushButton {
-                background-color: #d32f2f;
-                color: white;
-                border: none;
-                border-radius: 8px;
-                padding: 10px 15px;
-                font-size: 14pt;
-                font-weight: bold;
-                margin: 5px;
-                max-width: 180px;
-                min-width: 140px;
-            }
-        """)
-        self.connection_status_button.setEnabled(False)  # Делаем кнопку неактивной (только индикатор)
-        
-        # Координаты
-        self.coord_label = QLabel("Координати: Н/Д")
-        self.coord_label.setStyleSheet("color: #dbe7f3; font-size: 12pt; margin: 5px;")
-        
-        # Высота
-        self.altitude_label = QLabel("Висота: Н/Д")
-        self.altitude_label.setStyleSheet("color: #dbe7f3; font-size: 12pt; margin: 5px;")
-        
-        # Скорость
-        self.speed_label = QLabel("Швидкість: Н/Д")
-        self.speed_label.setStyleSheet("color: #dbe7f3; font-size: 12pt; margin: 5px;")
-        
-        # Батарея
-        self.battery_label = QLabel("Батарея:")
-        self.battery_label.setStyleSheet("color: #dbe7f3; font-size: 12pt; margin: 5px;")
-        
-        # Кнопка переключения режима батареи
-        self.battery_mode_button = QtWidgets.QPushButton("% → V")
-        self.battery_mode_button.setStyleSheet("""
-            QPushButton {
-                background-color: #1e2a30;
-                color: #dbe7f3;
-                border: 1px solid rgba(255,255,255,0.1);
-                border-radius: 6px;
-                padding: 4px 8px;
-                font-size: 10pt;
-                margin: 2px;
-            }
-            QPushButton:hover {
-                background-color: #26343d;
-            }
-        """)
-        self.battery_mode_button.clicked.connect(self.toggle_battery_mode)
-        
-        self.battery_progress = QProgressBar()
-        self.battery_progress.setStyleSheet("""
-            QProgressBar {
-                border: 2px solid rgba(255,255,255,0.1);
-                border-radius: 5px;
-                background-color: rgba(20,28,33,0.7);
-                text-align: center;
-                color: #dbe7f3;
-            }
-            QProgressBar::chunk {
-                background-color: #4CAF50;
-                border-radius: 3px;
-            }
-        """)
-        
-        # Добавляем в контейнер
-        telemetry_container = QtWidgets.QWidget()
-        telemetry_container.setGeometry(12, 50, 350, 450)
-        telemetry_container.setParent(self.leftPanel)
-        
-        # Контейнер для батареи
-        battery_container = QtWidgets.QWidget()
-        battery_layout = QHBoxLayout(battery_container)
-        battery_layout.setContentsMargins(0, 0, 0, 0)
-        battery_layout.addWidget(self.battery_label)
-        battery_layout.addWidget(self.battery_mode_button)
-        battery_layout.addStretch()
-        
-        # Контейнер для кнопки подключения (центрируем)
-        connection_container = QtWidgets.QWidget()
-        connection_layout = QHBoxLayout(connection_container)
-        connection_layout.setContentsMargins(0, 0, 0, 0)
-        connection_layout.addStretch()
-        connection_layout.addWidget(self.connection_status_button)
-        connection_layout.addStretch()
-        
-        layout = QVBoxLayout(telemetry_container)
-        layout.addWidget(connection_container)
-        layout.addWidget(self.coord_label)
-        layout.addWidget(self.altitude_label)
-        layout.addWidget(self.speed_label)
-        layout.addWidget(battery_container)
-        layout.addWidget(self.battery_progress)
-        layout.addStretch()
-        
-    def setup_drones_panel(self):
-        """Настройка панели списка дронов"""
-        # Список дронов
-        self.drones_list_widget = QListWidget()
-        self.drones_list_widget.setGeometry(12, 50, 350, 400)
-        self.drones_list_widget.setParent(self.centerPanel)
-        self.drones_list_widget.setStyleSheet("""
-            QListWidget {
-                background-color: rgba(30,42,48,0.7);
-                border: 1px solid rgba(255,255,255,0.1);
-                border-radius: 8px;
-                color: #dbe7f3;
-                font-size: 12pt;
-                padding: 5px;
-            }
-            QListWidget::item {
-                padding: 8px;
-                border-bottom: 1px solid rgba(255,255,255,0.05);
-            }
-            QListWidget::item:selected {
-                background-color: rgba(70,130,180,0.3);
-            }
-        """)
-        
-        # Додаємо інформаційний текст замість тестових дронів
+        # Инициализируем список дронов
         self.update_drones_list()
         
         # Подключаем обработчик выбора дрона
-        self.drones_list_widget.itemSelectionChanged.connect(self.on_drone_selected)
+        if hasattr(self, 'dronesListWidget'):
+            self.dronesListWidget.itemSelectionChanged.connect(self.on_drone_selected)
         
-    def setup_settings_panel(self):
-        """Настройка панели настроек"""
-        # Теперь логи встроены в UI через logsTextEdit - просто добавляем начальное сообщение
-        self.add_log("Система ініціалізована")
+    def set_connection_preset(self, host, port, protocol):
+        """Установка предустановленных значений подключения"""
+        if hasattr(self, 'hostInput'):
+            self.hostInput.setText(host)
+        if hasattr(self, 'portInput'):
+            self.portInput.setValue(port)
+        if hasattr(self, 'protocolCombo'):
+            self.protocolCombo.setCurrentText(protocol)
+        
+        self.add_log(f"🔧 Встановлено пресет: {protocol} {host}:{port}")
         
     def update_drones_list(self):
         """Оновлення списку підключених дронів"""
-        self.drones_list_widget.clear()
+        if not hasattr(self, 'dronesListWidget'):
+            return
+            
+        self.dronesListWidget.clear()
         
         if not self.connected_drones:
             # Якщо немає підключених дронів
             info_item = QtWidgets.QListWidgetItem("🔍 Немає підключених дронів")
             info_item.setFlags(info_item.flags() & ~QtCore.Qt.ItemIsSelectable)
-            self.drones_list_widget.addItem(info_item)
+            self.dronesListWidget.addItem(info_item)
             
             help_item = QtWidgets.QListWidgetItem("💡 Підключіться до дрона для перегляду")
             help_item.setFlags(help_item.flags() & ~QtCore.Qt.ItemIsSelectable)
-            self.drones_list_widget.addItem(help_item)
+            self.dronesListWidget.addItem(help_item)
         else:
             # Додаємо підключені дрони
             for drone in self.connected_drones:
-                self.drones_list_widget.addItem(drone)
+                self.dronesListWidget.addItem(drone)
                 
     def add_connected_drone(self, drone_info):
         """Додавання підключеного дрона до списку"""
@@ -320,11 +206,12 @@ class DroneControlApp(QMainWindow):
             self.add_log(f"🎯 Автоматично вибрано дрон: {drone_info}")
             
             # Выделяем дрон в списке
-            for i in range(self.drones_list_widget.count()):
-                item = self.drones_list_widget.item(i)
-                if item.text() == drone_info:
-                    self.drones_list_widget.setCurrentItem(item)
-                    break
+            if hasattr(self, 'dronesListWidget'):
+                for i in range(self.dronesListWidget.count()):
+                    item = self.dronesListWidget.item(i)
+                    if item.text() == drone_info:
+                        self.dronesListWidget.setCurrentItem(item)
+                        break
             
             # Активируем кнопки ARM/DISARM для подключенного дрона
             self.enable_arm_disarm_buttons(True)
@@ -338,7 +225,10 @@ class DroneControlApp(QMainWindow):
             
     def on_drone_selected(self):
         """Обробка вибору дрона"""
-        selected_items = self.drones_list_widget.selectedItems()
+        if not hasattr(self, 'dronesListWidget'):
+            return
+            
+        selected_items = self.dronesListWidget.selectedItems()
         if selected_items:
             drone_name = selected_items[0].text()
             
@@ -373,18 +263,35 @@ class DroneControlApp(QMainWindow):
         """Переключение режима отображения батареи"""
         if self.battery_display_mode == "percent":
             self.battery_display_mode = "voltage"
-            self.battery_mode_button.setText("V → %")
+            if hasattr(self, 'batteryModeButton'):
+                self.batteryModeButton.setText("V → %")
             self.add_log("Режим відображення батареї: Вольти")
         else:
             self.battery_display_mode = "percent"
-            self.battery_mode_button.setText("% → V")
+            if hasattr(self, 'batteryModeButton'):
+                self.batteryModeButton.setText("% → V")
             self.add_log("Режим відображення батареї: Проценти")
+    
+    def get_connection_params(self):
+        """Получение параметров подключения из UI"""
+        protocol = "TCP"
+        host = "192.168.1.118"
+        port = 5760
+        
+        if hasattr(self, 'protocolCombo'):
+            protocol = self.protocolCombo.currentText()
+        if hasattr(self, 'hostInput'):
+            host = self.hostInput.text().strip()
+        if hasattr(self, 'portInput'):
+            port = self.portInput.value()
+            
+        return protocol, host, port
     
     def quick_connect_drone(self):
         """Быстрое подключение к дрону с дефолтными настройками"""
         if not self.connected:
-            # Используем дефолтные настройки: TCP 192.168.1.118:5760
-            protocol, host, port = "TCP", "192.168.1.118", 5760
+            # Используем настройки из UI или дефолтные
+            protocol, host, port = self.get_connection_params()
             
             self.mavlink.set_connection_params(protocol, host, port)
             self.update_status("Підключення до дрона...")
@@ -418,40 +325,37 @@ class DroneControlApp(QMainWindow):
             self.add_log("⚠️ Дрон уже підключено!")
             
     def connect_drone(self):
-        """Підключення до дрона"""
+        """Підключення до дрона з настроек UI"""
         if not self.connected:
-            # Показываем диалог настройки подключения
-            connection_dialog = ConnectionDialog(self)
-            if connection_dialog.exec_() == QDialog.Accepted:
-                protocol, host, port = connection_dialog.get_connection_params()
+            protocol, host, port = self.get_connection_params()
+            
+            self.mavlink.set_connection_params(protocol, host, port)
+            self.update_status("Підключення...")
+            self.add_log("Спроба підключення до дрона...")
+            
+            # Пытаемся подключиться
+            if self.mavlink.connect():
+                self.connected = True
+                self.real_telemetry = True
                 
-                self.mavlink.set_connection_params(protocol, host, port)
-                self.update_status("Підключення...")
-                self.add_log("Спроба підключення до дрона...")
+                # Обновляем индикатор подключения ПОСЛЕ установки connected
+                self.update_connection_indicator(True)
+                # Таймер для реальных данных не нужен
+                self.timer.stop()
+                self.update_status("Підключено")
+                self.add_log("Підключення встановлено")
                 
-                # Пытаемся подключиться
-                if self.mavlink.connect():
-                    self.connected = True
-                    self.real_telemetry = True
-                    
-                    # Обновляем индикатор подключения ПОСЛЕ установки connected
-                    self.update_connection_indicator(True)
-                    # Таймер для реальных данных не нужен
-                    self.timer.stop()
-                    self.update_status("Підключено")
-                    self.add_log("Підключення встановлено")
-                    
-                    # Инициализируем состояние кнопок ARM/DISARM (по умолчанию разоружен)
-                    self.update_arm_buttons_state(False)
-                    
-                    # Додаємо дрон до списку підключених
-                    drone_name = f"🚁 Дрон ({protocol}://{host}:{port})"
-                    self.add_connected_drone(drone_name)
-                else:
-                    self.connected = False
-                    self.real_telemetry = False
-                    self.update_connection_indicator(False)
-                    self.update_status("Помилка підключення")
+                # Инициализируем состояние кнопок ARM/DISARM (по умолчанию разоружен)
+                self.update_arm_buttons_state(False)
+                
+                # Додаємо дрон до списку підключених
+                drone_name = f"🚁 Дрон ({protocol}://{host}:{port})"
+                self.add_connected_drone(drone_name)
+            else:
+                self.connected = False
+                self.real_telemetry = False
+                self.update_connection_indicator(False)
+                self.update_status("Помилка підключення")
         else:
             self.add_log("Вже підключено!")
             
@@ -482,24 +386,26 @@ class DroneControlApp(QMainWindow):
             self.timer.start(1000)
             
             # Сброс телеметрии
-            self.coord_label.setText("Координати: Н/Д")
-            self.altitude_label.setText("Висота: Н/Д")
-            self.speed_label.setText("Швидкість: Н/Д")
-            self.battery_progress.setValue(0)
+            self.reset_telemetry_display()
             
-    def check_system(self):
-        """Перевірка системи"""
-        self.update_status("Перевірка системи...")
-        self.add_log("Запуск діагностики системи...")
-        
-        # Имитация проверки
-        QtCore.QTimer.singleShot(3000, self.system_check_complete)
-        
-    def system_check_complete(self):
-        """Завершення перевірки системи"""
-        status = "Система в нормі" if random.choice([True, False, True]) else "Виявлено проблеми"
-        self.update_status(status)
-        self.add_log(f"Діагностика завершена: {status}")
+    def reset_telemetry_display(self):
+        """Сброс отображения телеметрии"""
+        if hasattr(self, 'coordinatesLabel'):
+            self.coordinatesLabel.setText("📍 Координати: Н/Д")
+        if hasattr(self, 'altitudeLabel'):
+            self.altitudeLabel.setText("📏 Висота: Н/Д")
+        if hasattr(self, 'speedLabel'):
+            self.speedLabel.setText("🏃 Швидкість: Н/Д")
+        if hasattr(self, 'batteryProgressBar'):
+            self.batteryProgressBar.setValue(0)
+        if hasattr(self, 'batteryLabel'):
+            self.batteryLabel.setText("🔋 Батарея:")
+        if hasattr(self, 'modeLabel'):
+            self.modeLabel.setText("🎛️ Режим: Н/Д")
+        if hasattr(self, 'armedLabel'):
+            self.armedLabel.setText("🔫 Озброєний: Ні")
+        if hasattr(self, 'gpsLabel'):
+            self.gpsLabel.setText("🛰️ GPS сат: 0")
         
     def arm_drone(self):
         """Вооружение дрона (ARM)"""
@@ -609,21 +515,28 @@ class DroneControlApp(QMainWindow):
             altitude = round(random.uniform(10, 500), 1)
             speed = round(random.uniform(0, 80), 1)
             
-            self.coord_label.setText(f"Координати: {lat}°, {lon}°")
-            self.altitude_label.setText(f"Висота: {altitude} м")
-            self.speed_label.setText(f"Швидкість: {speed} км/год")
+            if hasattr(self, 'coordinatesLabel'):
+                self.coordinatesLabel.setText(f"📍 Координати: {lat}°, {lon}°")
+            if hasattr(self, 'altitudeLabel'):
+                self.altitudeLabel.setText(f"📏 Висота: {altitude} м")
+            if hasattr(self, 'speedLabel'):
+                self.speedLabel.setText(f"🏃 Швидкість: {speed} км/год")
             
             # Обновление батареи в зависимости от режима
             if self.battery_display_mode == "percent":
                 battery_percent = random.randint(20, 100)
-                self.battery_progress.setValue(battery_percent)
-                self.battery_label.setText(f"Батарея: {battery_percent}%")
+                if hasattr(self, 'batteryProgressBar'):
+                    self.batteryProgressBar.setValue(battery_percent)
+                if hasattr(self, 'batteryLabel'):
+                    self.batteryLabel.setText(f"🔋 Батарея: {battery_percent}%")
             else:
                 # Режим напряжения (обычно 11.1V - 16.8V для Li-Po батарей)
                 voltage = round(random.uniform(11.1, 16.8), 1)
                 battery_percent = int(((voltage - 11.1) / (16.8 - 11.1)) * 100)
-                self.battery_progress.setValue(battery_percent)
-                self.battery_label.setText(f"Батарея: {voltage}V")
+                if hasattr(self, 'batteryProgressBar'):
+                    self.batteryProgressBar.setValue(battery_percent)
+                if hasattr(self, 'batteryLabel'):
+                    self.batteryLabel.setText(f"🔋 Батарея: {voltage}V")
                 
     def update_real_telemetry(self, telemetry_data):
         """Обновление реальных данных телеметрии от MAVLink"""
@@ -633,50 +546,61 @@ class DroneControlApp(QMainWindow):
         # Обновляем координаты
         lat = telemetry_data.get('lat', 0)
         lon = telemetry_data.get('lon', 0)
-        if lat != 0 and lon != 0:
-            self.coord_label.setText(f"Координати: {lat:.6f}°, {lon:.6f}°")
-        else:
-            self.coord_label.setText("Координати: GPS недоступний")
+        if hasattr(self, 'coordinatesLabel'):
+            if lat != 0 and lon != 0:
+                self.coordinatesLabel.setText(f"📍 Координати: {lat:.6f}°, {lon:.6f}°")
+            else:
+                self.coordinatesLabel.setText("📍 Координати: GPS недоступний")
         
         # Обновляем высоту
         altitude = telemetry_data.get('relative_alt', 0)
-        self.altitude_label.setText(f"Висота: {altitude:.1f} м")
+        if hasattr(self, 'altitudeLabel'):
+            self.altitudeLabel.setText(f"📏 Висота: {altitude:.1f} м")
         
         # Обновляем скорость
         speed = telemetry_data.get('groundspeed', 0)
-        self.speed_label.setText(f"Швидкість: {speed:.1f} км/год")
+        if hasattr(self, 'speedLabel'):
+            self.speedLabel.setText(f"🏃 Швидкість: {speed:.1f} км/год")
         
         # Обновляем батарею
         if self.battery_display_mode == "percent":
             battery_percent = telemetry_data.get('battery_remaining', 0)
             if battery_percent > 0:
-                self.battery_progress.setValue(battery_percent)
-                self.battery_label.setText(f"Батарея: {battery_percent}%")
+                if hasattr(self, 'batteryProgressBar'):
+                    self.batteryProgressBar.setValue(battery_percent)
+                if hasattr(self, 'batteryLabel'):
+                    self.batteryLabel.setText(f"🔋 Батарея: {battery_percent}%")
             else:
-                self.battery_progress.setValue(0)
-                self.battery_label.setText("Батарея: Н/Д")
+                if hasattr(self, 'batteryProgressBar'):
+                    self.batteryProgressBar.setValue(0)
+                if hasattr(self, 'batteryLabel'):
+                    self.batteryLabel.setText("🔋 Батарея: Н/Д")
         else:
             voltage = telemetry_data.get('battery_voltage', 0)
             if voltage > 0:
                 # Преобразуем напряжение в проценты для прогресс-бара
                 battery_percent = min(100, max(0, int(((voltage - 11.1) / (16.8 - 11.1)) * 100)))
-                self.battery_progress.setValue(battery_percent)
-                self.battery_label.setText(f"Батарея: {voltage:.1f}V")
+                if hasattr(self, 'batteryProgressBar'):
+                    self.batteryProgressBar.setValue(battery_percent)
+                if hasattr(self, 'batteryLabel'):
+                    self.batteryLabel.setText(f"🔋 Батарея: {voltage:.1f}V")
             else:
-                self.battery_progress.setValue(0)
-                self.battery_label.setText("Батарея: Н/Д")
+                if hasattr(self, 'batteryProgressBar'):
+                    self.batteryProgressBar.setValue(0)
+                if hasattr(self, 'batteryLabel'):
+                    self.batteryLabel.setText("🔋 Батарея: Н/Д")
                 
-        # Дополнительная информация в логи
+        # Дополнительная информация
         mode = telemetry_data.get('mode', 'UNKNOWN')
         armed = telemetry_data.get('armed', False)
         gps_sats = telemetry_data.get('satellites', 0)
         
-        status_info = f"Режим: {mode} | Озброєний: {'Так' if armed else 'Ні'} | GPS сат: {gps_sats}"
-        
-        # Обновляем статус только если есть изменения
-        if hasattr(self, 'last_status_info') and self.last_status_info != status_info:
-            self.add_log(f"📊 {status_info}")
-        self.last_status_info = status_info
+        if hasattr(self, 'modeLabel'):
+            self.modeLabel.setText(f"🎛️ Режим: {mode}")
+        if hasattr(self, 'armedLabel'):
+            self.armedLabel.setText(f"🔫 Озброєний: {'Так' if armed else 'Ні'}")
+        if hasattr(self, 'gpsLabel'):
+            self.gpsLabel.setText(f"🛰️ GPS сат: {gps_sats}")
         
         # Обновляем состояние кнопок ARM/DISARM в зависимости от статуса вооружения
         self.update_arm_buttons_state(armed)
@@ -705,9 +629,12 @@ class DroneControlApp(QMainWindow):
         
     def update_connection_indicator(self, connected):
         """Обновление индикатора подключения"""
+        if not hasattr(self, 'connectionStatusButton'):
+            return
+            
         if connected:
-            self.connection_status_button.setText("● ПІДКЛЮЧЕНО")
-            self.connection_status_button.setStyleSheet("""
+            self.connectionStatusButton.setText("● ПІДКЛЮЧЕНО")
+            self.connectionStatusButton.setStyleSheet("""
                 QPushButton {
                     background-color: #4CAF50;
                     color: white;
@@ -717,13 +644,11 @@ class DroneControlApp(QMainWindow):
                     font-size: 14pt;
                     font-weight: bold;
                     margin: 5px;
-                    max-width: 180px;
-                    min-width: 140px;
                 }
             """)
         else:
-            self.connection_status_button.setText("● ВІДКЛЮЧЕНО")
-            self.connection_status_button.setStyleSheet("""
+            self.connectionStatusButton.setText("● ВІДКЛЮЧЕНО")
+            self.connectionStatusButton.setStyleSheet("""
                 QPushButton {
                     background-color: #d32f2f;
                     color: white;
@@ -733,12 +658,8 @@ class DroneControlApp(QMainWindow):
                     font-size: 14pt;
                     font-weight: bold;
                     margin: 5px;
-                    max-width: 180px;
-                    min-width: 140px;
                 }
             """)
-        
-        # Кнопки ARM/DISARM теперь управляются отдельно через выбор дрона
     
     def enable_arm_disarm_buttons(self, enabled):
         """Включение/отключение кнопок ARM/DISARM"""
@@ -814,7 +735,7 @@ class DroneControlApp(QMainWindow):
         timestamp = datetime.datetime.now().strftime("%H:%M:%S")
         log_entry = f"[{timestamp}] {message}"
         
-        # Используем новый QPlainTextEdit из UI
+        # Используем QPlainTextEdit из UI
         if hasattr(self, 'logsTextEdit'):
             self.logsTextEdit.appendPlainText(log_entry)
             
@@ -823,165 +744,6 @@ class DroneControlApp(QMainWindow):
             scrollbar.setValue(scrollbar.maximum())
         else:
             print(f"Log: {log_entry}")  # Fallback в консоль если виджет не найден
-
-class ConnectionDialog(QDialog):
-    def __init__(self, parent=None):
-        super().__init__(parent)
-        self.setWindowTitle("Налаштування підключення до дрона")
-        self.setFixedSize(500, 450)  # Збільшено з 400x300 до 500x450
-        self.setStyleSheet("""
-            QDialog {
-                background-color: #0f1619;
-                color: #dbe7f3;
-                font-family: "Inter", "Roboto", "Segoe UI", sans-serif;
-            }
-            QLabel {
-                color: #dbe7f3;
-                font-size: 12pt;
-                margin: 5px;
-            }
-            QComboBox, QLineEdit, QSpinBox {
-                background-color: #1e2a30;
-                color: #dbe7f3;
-                border: 1px solid rgba(255,255,255,0.1);
-                border-radius: 6px;
-                padding: 8px;
-                font-size: 12pt;
-                min-height: 30px;
-            }
-            QPushButton {
-                background-color: #1e2a30;
-                color: #dbe7f3;
-                border: 1px solid rgba(255,255,255,0.1);
-                border-radius: 8px;
-                padding: 8px 16px;
-                font-size: 12pt;
-            }
-            QPushButton:hover {
-                background-color: #26343d;
-            }
-            QPushButton:pressed {
-                background-color: #1a2429;
-            }
-        """)
-        
-        self.setup_ui()
-        
-    def setup_ui(self):
-        layout = QVBoxLayout(self)
-        layout.setSpacing(20)  # Збільшено відступи
-        layout.setContentsMargins(25, 25, 25, 25)  # Збільшено поля
-        
-        # Заголовок
-        title = QLabel("🔗 Параметри з'єднання MAVLink")
-        title.setStyleSheet("font-size: 18pt; font-weight: bold; color: #e6f0fa; margin-bottom: 15px;")
-        layout.addWidget(title)
-        
-        # Протокол
-        protocol_layout = QHBoxLayout()
-        protocol_layout.addWidget(QLabel("Протокол:"))
-        self.protocol_combo = QComboBox()
-        self.protocol_combo.addItems(["UDP", "TCP"])
-        self.protocol_combo.setCurrentText("TCP")  # Дефолт TCP
-        protocol_layout.addWidget(self.protocol_combo)
-        layout.addLayout(protocol_layout)
-        
-        # Хост
-        host_layout = QHBoxLayout()
-        host_layout.addWidget(QLabel("IP адреса:"))
-        self.host_input = QLineEdit("192.168.1.118")  # Дефолт IP дрона
-        self.host_input.setPlaceholderText("Введіть IP адресу дрона")
-        host_layout.addWidget(self.host_input)
-        layout.addLayout(host_layout)
-        
-        # Порт
-        port_layout = QHBoxLayout()
-        port_layout.addWidget(QLabel("Порт:"))
-        self.port_input = QSpinBox()
-        self.port_input.setRange(1, 65535)
-        self.port_input.setValue(5760)  # Дефолт порт дрона
-        port_layout.addWidget(self.port_input)
-        layout.addLayout(port_layout)
-        
-        # Предустановки
-        presets_layout = QVBoxLayout()
-        presets_label = QLabel("📋 Готові налаштування:")
-        presets_label.setStyleSheet("font-weight: bold; margin-top: 10px;")
-        presets_layout.addWidget(presets_label)
-        
-        preset_buttons_layout = QHBoxLayout()
-        preset_buttons_layout.setSpacing(10)
-        
-        mission_button = QPushButton("Mission Planner")
-        mission_button.setStyleSheet("min-height: 35px; font-size: 11pt; padding: 8px;")
-        mission_button.setToolTip("UDP 127.0.0.1:14551")
-        mission_button.clicked.connect(lambda: self.set_preset("127.0.0.1", 14551, "UDP"))
-        
-        sitl_button = QPushButton("SITL")
-        sitl_button.setStyleSheet("min-height: 35px; font-size: 11pt; padding: 8px;")
-        sitl_button.setToolTip("TCP 127.0.0.1:5760")
-        sitl_button.clicked.connect(lambda: self.set_preset("127.0.0.1", 5760, "TCP"))
-        
-        preset_buttons_layout.addWidget(mission_button)
-        preset_buttons_layout.addWidget(sitl_button)
-        
-        presets_layout.addLayout(preset_buttons_layout)
-        layout.addLayout(presets_layout)
-        
-        # Информация
-        info_label = QLabel("""
-ℹ️ Інформація:
-• UDP 14550 - стандартний порт QGroundControl
-• UDP 14551 - Mission Planner
-• TCP 5760 - SITL симулятор
-• Для реального дрона використовуйте його IP""")
-        info_label.setStyleSheet("font-size: 10pt; color: #a0a0a0; margin: 10px 0;")
-        info_label.setWordWrap(True)
-        layout.addWidget(info_label)
-        
-        # Кнопки
-        buttons_layout = QHBoxLayout()
-        buttons_layout.setSpacing(15)  # Відступ між кнопками
-        
-        connect_button = QPushButton("🔗 Підключитися")
-        connect_button.setStyleSheet("""
-            QPushButton {
-                background-color: #4CAF50; 
-                font-weight: bold;
-                font-size: 14pt;
-                padding: 12px 20px;
-                min-height: 45px;
-            }
-        """)
-        connect_button.clicked.connect(self.accept)
-        
-        cancel_button = QPushButton("❌ Скасувати")
-        cancel_button.setStyleSheet("""
-            QPushButton {
-                font-size: 14pt;
-                padding: 12px 20px;
-                min-height: 45px;
-            }
-        """)
-        cancel_button.clicked.connect(self.reject)
-        
-        buttons_layout.addWidget(cancel_button)
-        buttons_layout.addWidget(connect_button)
-        layout.addLayout(buttons_layout)
-        
-    def set_preset(self, host, port, protocol):
-        """Установка предустановленных значений"""
-        self.host_input.setText(host)
-        self.port_input.setValue(port)
-        self.protocol_combo.setCurrentText(protocol)
-        
-    def get_connection_params(self):
-        """Получение параметров подключения"""
-        return (
-            self.protocol_combo.currentText(),
-            self.host_input.text().strip(),
-            self.port_input.value()
-        )
 
 def main():
     app = QApplication(sys.argv)

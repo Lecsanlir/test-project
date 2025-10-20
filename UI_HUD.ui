@@ -6,18 +6,18 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1200</width>
-    <height>800</height>
+    <width>1400</width>
+    <height>900</height>
    </rect>
   </property>
   <property name="minimumSize">
    <size>
-    <width>800</width>
-    <height>600</height>
+    <width>1000</width>
+    <height>700</height>
    </size>
   </property>
   <property name="windowTitle">
-   <string>Інтерфейс Управління Дронами</string>
+   <string>🚁 Інтерфейс Управління Дронами - Єдиний UI</string>
   </property>
   <widget class="QWidget" name="centralwidget">
    <property name="styleSheet">
@@ -97,19 +97,19 @@ QTextEdit, QPlainTextEdit {
        <widget class="QFrame" name="leftPanel">
         <property name="minimumSize">
          <size>
-          <width>250</width>
+          <width>280</width>
           <height>0</height>
          </size>
         </property>
         <property name="maximumSize">
          <size>
-          <width>350</width>
+          <width>400</width>
           <height>16777215</height>
          </size>
         </property>
         <layout class="QVBoxLayout" name="leftPanelLayout">
          <property name="spacing">
-          <number>12</number>
+          <number>8</number>
          </property>
          <property name="leftMargin">
           <number>12</number>
@@ -126,10 +126,179 @@ QTextEdit, QPlainTextEdit {
          <item>
           <widget class="QLabel" name="radarTitle">
            <property name="text">
-            <string>Телеметрiя</string>
+            <string>📡 Телеметрiя</string>
            </property>
            <property name="alignment">
             <set>Qt::AlignCenter</set>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="connectionStatusButton">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
+           <property name="minimumSize">
+            <size>
+             <width>0</width>
+             <height>40</height>
+            </size>
+           </property>
+           <property name="text">
+            <string>● ВІДКЛЮЧЕНО</string>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">
+QPushButton {
+    background-color: #d32f2f;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 10px 15px;
+    font-size: 14pt;
+    font-weight: bold;
+    margin: 5px;
+}
+            </string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="coordinatesLabel">
+           <property name="text">
+            <string>📍 Координати: Н/Д</string>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">color: #dbe7f3; font-size: 12pt; margin: 5px;</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="altitudeLabel">
+           <property name="text">
+            <string>📏 Висота: Н/Д</string>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">color: #dbe7f3; font-size: 12pt; margin: 5px;</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="speedLabel">
+           <property name="text">
+            <string>🏃 Швидкість: Н/Д</string>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">color: #dbe7f3; font-size: 12pt; margin: 5px;</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <layout class="QHBoxLayout" name="batteryLayout">
+           <item>
+            <widget class="QLabel" name="batteryLabel">
+             <property name="text">
+              <string>🔋 Батарея:</string>
+             </property>
+             <property name="styleSheet">
+              <string notr="true">color: #dbe7f3; font-size: 12pt; margin: 5px;</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QPushButton" name="batteryModeButton">
+             <property name="maximumSize">
+              <size>
+               <width>60</width>
+               <height>30</height>
+              </size>
+             </property>
+             <property name="text">
+              <string>% → V</string>
+             </property>
+             <property name="styleSheet">
+              <string notr="true">
+QPushButton {
+    background-color: #1e2a30;
+    color: #dbe7f3;
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 6px;
+    padding: 4px 8px;
+    font-size: 10pt;
+    margin: 2px;
+}
+QPushButton:hover {
+    background-color: #26343d;
+}
+              </string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <spacer name="batterySpacer">
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>40</width>
+               <height>20</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+          </layout>
+         </item>
+         <item>
+          <widget class="QProgressBar" name="batteryProgressBar">
+           <property name="value">
+            <number>0</number>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">
+QProgressBar {
+    border: 2px solid rgba(255,255,255,0.1);
+    border-radius: 5px;
+    background-color: rgba(20,28,33,0.7);
+    text-align: center;
+    color: #dbe7f3;
+    font-weight: bold;
+}
+QProgressBar::chunk {
+    background-color: #4CAF50;
+    border-radius: 3px;
+}
+            </string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="modeLabel">
+           <property name="text">
+            <string>🎛️ Режим: Н/Д</string>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">color: #dbe7f3; font-size: 12pt; margin: 5px;</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="armedLabel">
+           <property name="text">
+            <string>🔫 Озброєний: Ні</string>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">color: #dbe7f3; font-size: 12pt; margin: 5px;</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="gpsLabel">
+           <property name="text">
+            <string>🛰️ GPS сат: 0</string>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">color: #dbe7f3; font-size: 12pt; margin: 5px;</string>
            </property>
           </widget>
          </item>
@@ -159,13 +328,13 @@ QTextEdit, QPlainTextEdit {
         </property>
         <property name="minimumSize">
          <size>
-          <width>300</width>
+          <width>400</width>
           <height>0</height>
          </size>
         </property>
         <layout class="QVBoxLayout" name="centerPanelLayout">
          <property name="spacing">
-          <number>12</number>
+          <number>8</number>
          </property>
          <property name="leftMargin">
           <number>12</number>
@@ -182,7 +351,7 @@ QTextEdit, QPlainTextEdit {
          <item>
           <widget class="QLabel" name="videoTitle">
            <property name="text">
-            <string>Список дронiв</string>
+            <string>🚁 Управління дронами</string>
            </property>
            <property name="alignment">
             <set>Qt::AlignCenter</set>
@@ -190,67 +359,160 @@ QTextEdit, QPlainTextEdit {
           </widget>
          </item>
          <item>
-          <spacer name="centerPanelSpacer">
-           <property name="orientation">
-            <enum>Qt::Vertical</enum>
+          <widget class="QGroupBox" name="connectionGroupBox">
+           <property name="title">
+            <string>🔗 Підключення MAVLink</string>
            </property>
-           <property name="sizeHint" stdset="0">
-            <size>
-             <width>20</width>
-             <height>40</height>
-            </size>
+           <property name="styleSheet">
+            <string notr="true">
+QGroupBox {
+    color: #dbe7f3;
+    border: 2px solid rgba(255,255,255,0.1);
+    border-radius: 8px;
+    margin-top: 1ex;
+    font-weight: bold;
+}
+QGroupBox::title {
+    subcontrol-origin: margin;
+    left: 10px;
+    padding: 0 8px 0 8px;
+}
+            </string>
            </property>
-          </spacer>
-         </item>
-         <item>
-          <layout class="QHBoxLayout" name="armDisarmLayout">
-           <item>
-            <widget class="QPushButton" name="armButton">
-             <property name="enabled">
-              <bool>true</bool>
-             </property>
-             <property name="text">
-              <string>🔫 ARM</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QPushButton" name="disarmButton">
-             <property name="enabled">
-              <bool>true</bool>
-             </property>
-             <property name="text">
-              <string>🛡️ DISARM</string>
-             </property>
-            </widget>
-           </item>
-          </layout>
+           <layout class="QGridLayout" name="connectionGridLayout">
+            <item row="0" column="0">
+             <widget class="QLabel" name="protocolLabel">
+              <property name="text">
+               <string>Протокол:</string>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="1">
+             <widget class="QComboBox" name="protocolCombo">
+              <property name="styleSheet">
+               <string notr="true">
+QComboBox {
+    background-color: #1e2a30;
+    color: #dbe7f3;
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 6px;
+    padding: 8px;
+    font-size: 12pt;
+    min-height: 25px;
+}
+               </string>
+              </property>
+              <item>
+               <property name="text">
+                <string>TCP</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>UDP</string>
+               </property>
+              </item>
+             </widget>
+            </item>
+            <item row="1" column="0">
+             <widget class="QLabel" name="hostLabel">
+              <property name="text">
+               <string>IP адреса:</string>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="1">
+             <widget class="QLineEdit" name="hostInput">
+              <property name="text">
+               <string>192.168.1.118</string>
+              </property>
+              <property name="placeholderText">
+               <string>Введіть IP адресу</string>
+              </property>
+              <property name="styleSheet">
+               <string notr="true">
+QLineEdit {
+    background-color: #1e2a30;
+    color: #dbe7f3;
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 6px;
+    padding: 8px;
+    font-size: 12pt;
+    min-height: 25px;
+}
+               </string>
+              </property>
+             </widget>
+            </item>
+            <item row="2" column="0">
+             <widget class="QLabel" name="portLabel">
+              <property name="text">
+               <string>Порт:</string>
+              </property>
+             </widget>
+            </item>
+            <item row="2" column="1">
+             <widget class="QSpinBox" name="portInput">
+              <property name="minimum">
+               <number>1</number>
+              </property>
+              <property name="maximum">
+               <number>65535</number>
+              </property>
+              <property name="value">
+               <number>5760</number>
+              </property>
+              <property name="styleSheet">
+               <string notr="true">
+QSpinBox {
+    background-color: #1e2a30;
+    color: #dbe7f3;
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 6px;
+    padding: 8px;
+    font-size: 12pt;
+    min-height: 25px;
+}
+               </string>
+              </property>
+             </widget>
+            </item>
+            <item row="3" column="0" colspan="2">
+             <layout class="QHBoxLayout" name="presetLayout">
+              <item>
+               <widget class="QPushButton" name="missionPlannerButton">
+                <property name="text">
+                 <string>Mission Planner</string>
+                </property>
+                <property name="toolTip">
+                 <string>UDP 127.0.0.1:14551</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QPushButton" name="sitlButton">
+                <property name="text">
+                 <string>SITL</string>
+                </property>
+                <property name="toolTip">
+                 <string>TCP 127.0.0.1:5760</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+           </layout>
+          </widget>
          </item>
          <item>
           <layout class="QHBoxLayout" name="connectionLayout">
            <item>
             <widget class="QPushButton" name="stopButton">
              <property name="text">
-              <string>Підключити</string>
+              <string>🔗 Підключити</string>
              </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QPushButton" name="connectButton">
-             <property name="text">
-              <string>Відключити</string>
-             </property>
-            </widget>
-           </item>
-          </layout>
-         </item>
-         <item>
-          <widget class="QPushButton" name="startButton">
-           <property name="text">
-            <string>🚁 Швидке підключення</string>
-           </property>
-           <property name="styleSheet">
-            <string notr="true">
+             <property name="styleSheet">
+              <string notr="true">
 QPushButton {
     background-color: #2e7d32;
     color: white;
@@ -266,9 +528,158 @@ QPushButton:hover {
 QPushButton:pressed {
     background-color: #1b5e20;
 }
+              </string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QPushButton" name="connectButton">
+             <property name="text">
+              <string>❌ Відключити</string>
+             </property>
+             <property name="styleSheet">
+              <string notr="true">
+QPushButton {
+    background-color: #d32f2f;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 8px 16px;
+    font-weight: bold;
+    min-height: 36px;
+}
+QPushButton:hover {
+    background-color: #f44336;
+}
+QPushButton:pressed {
+    background-color: #b71c1c;
+}
+              </string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+         <item>
+          <widget class="QPushButton" name="startButton">
+           <property name="text">
+            <string>🚁 Швидке підключення</string>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">
+QPushButton {
+    background-color: #ff9800;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 8px 16px;
+    font-weight: bold;
+    min-height: 40px;
+    font-size: 14pt;
+}
+QPushButton:hover {
+    background-color: #fb8c00;
+}
+QPushButton:pressed {
+    background-color: #ef6c00;
+}
             </string>
            </property>
           </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="dronesListTitle">
+           <property name="text">
+            <string>📋 Підключені дрони:</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignCenter</set>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">font-weight: bold; margin-top: 10px;</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QListWidget" name="dronesListWidget">
+           <property name="minimumSize">
+            <size>
+             <width>0</width>
+             <height>120</height>
+            </size>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">
+QListWidget {
+    background-color: rgba(30,42,48,0.7);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 8px;
+    color: #dbe7f3;
+    font-size: 12pt;
+    padding: 5px;
+}
+QListWidget::item {
+    padding: 8px;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+QListWidget::item:selected {
+    background-color: rgba(70,130,180,0.3);
+}
+            </string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <layout class="QHBoxLayout" name="armDisarmLayout">
+           <item>
+            <widget class="QPushButton" name="armButton">
+             <property name="enabled">
+              <bool>false</bool>
+             </property>
+             <property name="text">
+              <string>🔫 ARM</string>
+             </property>
+             <property name="styleSheet">
+              <string notr="true">
+QPushButton {
+    background-color: #424242;
+    color: #9e9e9e;
+    border: none;
+    border-radius: 8px;
+    padding: 8px 16px;
+    font-size: 12pt;
+    font-weight: bold;
+    min-height: 36px;
+}
+              </string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QPushButton" name="disarmButton">
+             <property name="enabled">
+              <bool>false</bool>
+             </property>
+             <property name="text">
+              <string>🛡️ DISARM</string>
+             </property>
+             <property name="styleSheet">
+              <string notr="true">
+QPushButton {
+    background-color: #424242;
+    color: #9e9e9e;
+    border: none;
+    border-radius: 8px;
+    padding: 8px 16px;
+    font-size: 12pt;
+    font-weight: bold;
+    min-height: 36px;
+}
+              </string>
+             </property>
+            </widget>
+           </item>
+          </layout>
          </item>
         </layout>
        </widget>
